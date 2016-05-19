@@ -1,0 +1,11 @@
+[Unit]
+Description = inotify trigger clamscan
+After = syslog.target network.target
+
+[Service]
+Type = simple
+ExecStart = /usr/bin/inotify_scan.sh
+Restart = on-failure
+PrivateTmp = true
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# inotifywait: Start/Stop inotifywait
+#
+# chkconfig: - 80 20
+# description: inotifywait waits for changes to files using inotify.
+#
+# processname: inotifywait
+
+. /etc/rc.d/init.d/functions
+. /etc/sysconfig/network
+. /etc/inotifywait.conf
+
+RETVAL=0
+
+start() {
+   proc_num=$(ps -ef | grep "inotify" | grep -vw $$ | grep -vw "grep" | wc -l)
+   if [[ $proc_num -ne 0 ]]
+   then
+      echo -e "Already running, exit.\n"
+      exit
+   fi
+   echo -n $"Starting inotifywait: "
+   RETVAL=1
+   daemon /usr/bin/inotify_scan.sh
+   RETVAL=$?
+   echo
+   return $RETVAL
+}
+
+stop() {
+   echo -n $"Stopping inotifywait: "
+   killproc /usr/bin/inotify_scan.sh
+   RETVAL=$?
+   echo
+   return $RETVAL
+}
+
+case "$1" in
+   start)
+      start
+      ;;
+   stop)
+      stop
+      ;;
+   status)
+      status inotifywait
+      ;;
+   restart)
+      stop
+      start
+      ;;
+   *)
+      echo $"Usage: $0 {start|stop|status|restart}"
+      exit 1
+esac
+exit $?
